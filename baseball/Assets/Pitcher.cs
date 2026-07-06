@@ -62,9 +62,9 @@ public class Pitcher : MonoBehaviour
             Debug.LogWarning("【警告】生成されたBallにRigidbodyコンポーネントがついていません！");
         }
 
-        // 念のため、3秒経ってもどこにも当たらなかった場合はフラグをリセットして次を投げられるようにする
-        Invoke("ResetPitching", 3f);
-        Destroy(ball, 3f);
+        // 念のため、秒経ってもどこにも当たらなかった場合はフラグをリセットして次を投げられるようにする
+        Invoke("ResetPitching", 5f);
+        Destroy(ball, 5f);
     }
 
     // 【追加】判定が終わったときに、アンパイアやInvokeから呼ばれる関数
