@@ -1,4 +1,3 @@
-//判定が出た瞬間にピッチャーの制限を解除するように
 using UnityEngine;
 
 public class Umpire : MonoBehaviour
@@ -9,10 +8,19 @@ public class Umpire : MonoBehaviour
     {
         if (other.CompareTag("Ball"))
         {
+            // BSOManagerを探しておく
+            BSOManager bso = GameObject.FindAnyObjectByType<BSOManager>();
+
             if (gameObject.name == "StrikeZone")
             {
                 hasTouchedStrikeZone = true;
                 Debug.Log("<color=red>★ストライク！★</color>");
+
+                // 【追加】ストライクゾーンを通過した瞬間、ストライクカウントを1増やす
+                if (bso != null)
+                {
+                    bso.AddStrike();
+                }
             }
 
             if (gameObject.name == "CatcherWall")
@@ -21,15 +29,28 @@ public class Umpire : MonoBehaviour
 
                 if (zoneUmpire != null && zoneUmpire.hasTouchedStrikeZone)
                 {
+                    // ストライクゾーンをすでに通っている場合、ここではカウントは増やさない（リセットだけ）
                     zoneUmpire.hasTouchedStrikeZone = false;
                 }
                 else
                 {
                     Debug.Log("<color=green>◇ボール！◇</color>");
+
+                    // 【追加】ストライクゾーンを通らずにキャッチャー壁に当たった＝ボールカウントを1増やす
+                    if (bso != null)
+                    {
+                        bso.AddBall();
+                    }
                 }
 
-                // 【追加】キャッチャーがボールを受け取ったので、ピッチャーの投球制限を解除する
-                Pitcher pitcher = GameObject.Find("Capsule").GetComponent<Pitcher>();
+                // キャッチャーがボールを受け取ったので、ピッチャーの投球制限を解除する
+                Pitcher pitcher = GameObject.Find("Capsule")?.GetComponent<Pitcher>();
+                if (pitcher == null)
+                {
+                    // ピッチャーのオブジェクト名が「Batter」の子オブジェクトなど別名になっている場合の対策
+                    pitcher = GameObject.FindAnyObjectByType<Pitcher>();
+                }
+
                 if (pitcher != null)
                 {
                     pitcher.CancelInvoke("ResetPitching"); // 3秒の自動消滅タイマーを止める

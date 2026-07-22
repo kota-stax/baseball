@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5688593112721493591}
   - component: {fileID: 4577257549717457673}
   - component: {fileID: -5298872182479706694}
+  - component: {fileID: 5934440079341033896}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Ball
@@ -140,3 +141,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5934440079341033896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2208591302377875567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fe6a5d19560e74f90ea3ab474dd8d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundTrigger
+  destroyDelay: 7

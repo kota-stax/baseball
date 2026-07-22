@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ball
+  - Foul
+  - Hit
+  - TwoBase
+  - Bat
+  - Out
   layers:
   - Default
   - TransparentFX
