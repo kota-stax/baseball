@@ -59,15 +59,20 @@ public class GroundTrigger : MonoBehaviour
         hasLanded = true;
         BSOManager bso = GameObject.FindAnyObjectByType<BSOManager>();
 
+        // ★【追加】RunnerManager を探しておく
+        RunnerManager runner = GameObject.FindAnyObjectByType<RunnerManager>();
+
         switch (resultTag)
         {
             case "Hit":
                 Debug.Log("<color=cyan>★★★ ヒット！ ★★★</color>");
+                if (runner != null) runner.AdvanceSingle(); // ★ランナー1つ進塁（UI更新）
                 if (bso != null) bso.Reset打席();
                 break;
 
             case "TwoBase":
                 Debug.Log("<color=yellow>★★★ ツーベースヒット！ ★★★</color>");
+                if (runner != null) runner.AdvanceTwoBase(); // ★ランナー2つ進塁（UI更新）
                 if (bso != null) bso.Reset打席();
                 break;
 

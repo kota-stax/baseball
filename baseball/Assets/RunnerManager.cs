@@ -20,15 +20,10 @@ public class RunnerManager : MonoBehaviour
     private float timer = 0f;
     private bool isBlinkOn = true;
 
-    void Start()
-    {
-        UpdateUI();
-    }
-
     void Update()
     {
         // ランナーがいる塁をチカチカ点滅させる演出
-        timer += Time.deltaTime * 3f; // 点滅スピード
+        timer += Time.deltaTime * 3f;
         isBlinkOn = Mathf.Sin(timer) > 0;
 
         // UIの表示更新
@@ -37,36 +32,60 @@ public class RunnerManager : MonoBehaviour
         if (image3rd != null) image3rd.color = has3rd ? (isBlinkOn ? onColor : offColor) : offColor;
     }
 
-    // 単打（シングルヒット / フォアボールなど）の進塁処理
+    // 単打（シングルヒット / フォアボール）の進塁処理
     public void AdvanceSingle()
     {
-        // 押し出し判定（満塁なら得点）
+        int runScored = 0;
+
         if (has1st && has2nd && has3rd)
         {
-            Debug.Log("<color=orange>押し出し1点追加！</color>");
+            // 満塁時のヒット/押し出し ➔ 3塁ランナー生還（1点）
+            runScored = 1;
         }
         else if (has1st && has2nd)
         {
-            has3rd = true; // 1,2塁なら満塁に
+            has3rd = true;
         }
         else if (has1st)
         {
-            has2nd = true; // 1塁なら1,2塁に
+            has2nd = true;
         }
 
         has1st = true; // バッターランナーが1塁へ
-        UpdateUI();
+
+        // 生還者がいればスコア加算
+        CheckAndAddScore(runScored);
     }
 
     // ツーベースヒットの進塁処理
     public void AdvanceTwoBase()
     {
-        // 2塁・3塁ランナーは生還（得点）
-        // 1塁ランナーは3塁へ
+        int runScored = 0;
+
+        // 3塁ランナーと2塁ランナーが生還
+        if (has3rd) runScored++;
+        if (has2nd) runScored++;
+
+        // 1塁ランナーは3塁へ移動
         has3rd = has1st;
         has2nd = true; // バッターランナーが2塁へ
         has1st = false;
-        UpdateUI();
+
+        // 生還者がいればスコア加算
+        CheckAndAddScore(runScored);
+    }
+
+    // スコアマネージャーに得点を送る関数
+    private void CheckAndAddScore(int runs)
+    {
+        if (runs > 0)
+        {
+            ScoreManager scoreMgr = GameObject.FindAnyObjectByType<ScoreManager>();
+            if (scoreMgr != null)
+            {
+                scoreMgr.AddScore(runs);
+            }
+        }
     }
 
     // チェンジ・打席リセット時の全ランナークリア
@@ -75,11 +94,5 @@ public class RunnerManager : MonoBehaviour
         has1st = false;
         has2nd = false;
         has3rd = false;
-        UpdateUI();
-    }
-
-    void UpdateUI()
-    {
-        // 点滅ロジックがあるのでUpdate内で処理
     }
 }

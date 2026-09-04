@@ -1,4 +1,3 @@
-//テスト、球連射できないように
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,13 +10,13 @@ public class Pitcher : MonoBehaviour
     [Header("--- 調整パラメータ ---")]
     public float pitchSpeed = 20f;
 
-    // 【追加】今、球がすでに投げられているかどうかを管理するフラグ
-    [HideInInspector] // インスペクターには表示させない設定
+    // 今、球がすでに投げられているかどうかを管理するフラグ
+    [HideInInspector]
     public bool isPitching = false;
 
     void Update()
     {
-        // 【追加】すでに球が投げられている（投球中）なら、キー入力を無視する
+        // すでに球が投げられている（投球中）なら、キー入力を無視する
         if (isPitching) return;
 
         bool isSpacePressed = false;
@@ -45,32 +44,43 @@ public class Pitcher : MonoBehaviour
             return;
         }
 
-        // 【追加】投げたので「投球中」にする
+        // 投げたので「投球中」にする
         isPitching = true;
 
         GameObject ball = Instantiate(ballPrefab, releasePoint.position, Quaternion.identity);
-        Debug.Log("球を発射しました！向き: " + transform.forward + " / 速度: " + pitchSpeed);
+
+        // ★【変更箇所】 PitcherCursor3D を探して目標方向を計算
+        PitcherCursor3D cursor = GameObject.FindAnyObjectByType<PitcherCursor3D>();
+        Vector3 throwDirection = transform.forward; // デフォルト（正面）
+
+        if (cursor != null)
+        {
+            // releasePoint から 3Dカーソルへ向かうベクトルを算出
+            Vector3 targetPos = cursor.GetTargetWorldPosition();
+            throwDirection = (targetPos - releasePoint.position).normalized;
+        }
+
+        Debug.Log("球を発射しました！ 速度: " + pitchSpeed);
 
         Rigidbody rb = ball.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.useGravity = false;
-            rb.linearVelocity = transform.forward * pitchSpeed;
+            rb.linearVelocity = throwDirection * pitchSpeed;
         }
         else
         {
             Debug.LogWarning("【警告】生成されたBallにRigidbodyコンポーネントがついていません！");
         }
 
-        // 念のため、秒経ってもどこにも当たらなかった場合はフラグをリセットして次を投げられるようにする
+        // 5秒経過しても判定が終わらなければ自動リセット
         Invoke("ResetPitching", 5f);
         Destroy(ball, 5f);
     }
 
-    // 【追加】判定が終わったときに、アンパイアやInvokeから呼ばれる関数
+    // 判定が終わったときにアンパイアやInvokeから呼ばれる関数
     public void ResetPitching()
     {
-        // すでにリセットされていれば何もしない（重複防止）
         if (!isPitching) return;
 
         isPitching = false;

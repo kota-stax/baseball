@@ -27,7 +27,15 @@ public class BSOManager : MonoBehaviour
         if (ballCount >= 4)
         {
             Debug.Log("フォアボール！");
-            ResetInning(); // 本来はランナー進塁ですが、一旦リセット
+
+            // フォアボール時もランナーを1つ進塁させる
+            RunnerManager runner = GameObject.FindAnyObjectByType<RunnerManager>();
+            if (runner != null)
+            {
+                runner.AdvanceSingle();
+            }
+
+            Reset打席(); // 打席カウントのみリセット
         }
         UpdateVisuals();
     }
@@ -52,8 +60,11 @@ public class BSOManager : MonoBehaviour
         if (outCount >= 3)
         {
             Debug.Log("3アウト！チェンジ！");
-            outCount = 0;
-            ResetInning();
+            ResetInning(); // 全カウント＆ランナーリセット
+        }
+        else
+        {
+            Reset打席(); // 1~2アウト時は打席カウント（B/S）のみリセット
         }
         UpdateVisuals();
     }
@@ -72,6 +83,21 @@ public class BSOManager : MonoBehaviour
         ballCount = 0;
         strikeCount = 0;
         outCount = 0;
+
+        // ランナーをリセット
+        RunnerManager runner = GameObject.FindAnyObjectByType<RunnerManager>();
+        if (runner != null)
+        {
+            runner.ResetRunners();
+        }
+
+        // イニングを進める（表/裏の切り替え・ゲームセット判定）
+        InningManager inningMgr = GameObject.FindAnyObjectByType<InningManager>();
+        if (inningMgr != null)
+        {
+            inningMgr.ChangeInning();
+        }
+
         UpdateVisuals();
     }
 
@@ -80,24 +106,34 @@ public class BSOManager : MonoBehaviour
     {
         Color darkGray = new Color(0.2f, 0.2f, 0.2f); // 消灯時の色
 
-        // ボールランプの更新 (黄色)
-        for (int i = 0; i < ballLamps.Length; i++)
+        // ★【変更】ボールランプの更新 (シアン/緑青)
+        if (ballLamps != null)
         {
-            ballLamps[i].color = (i < ballCount) ? Color.yellow : darkGray;
+            for (int i = 0; i < ballLamps.Length; i++)
+            {
+                if (ballLamps[i] != null)
+                    ballLamps[i].color = (i < ballCount) ? Color.cyan : darkGray;
+            }
         }
 
-        // ストライクランプの更新 (青または黄緑)
-        for (int i = 0; i < strikeLamps.Length; i++)
+        // ★【変更】ストライクランプの更新 (黄色)
+        if (strikeLamps != null)
         {
-            // プロ野球中継風に少し鮮やかな青（シアン）にします
-            ballLamps[i].color = (i < ballCount) ? Color.cyan : darkGray;
-            strikeLamps[i].color = (i < strikeCount) ? Color.yellow : darkGray;
+            for (int i = 0; i < strikeLamps.Length; i++)
+            {
+                if (strikeLamps[i] != null)
+                    strikeLamps[i].color = (i < strikeCount) ? Color.yellow : darkGray;
+            }
         }
 
         // アウトランプの更新 (赤)
-        for (int i = 0; i < outLamps.Length; i++)
+        if (outLamps != null)
         {
-            outLamps[i].color = (i < outCount) ? Color.red : darkGray;
+            for (int i = 0; i < outLamps.Length; i++)
+            {
+                if (outLamps[i] != null)
+                    outLamps[i].color = (i < outCount) ? Color.red : darkGray;
+            }
         }
     }
 }

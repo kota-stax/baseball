@@ -30,10 +30,10 @@ public class CursorController : MonoBehaviour
         // キーボード入力のチェック
         if (Keyboard.current != null)
         {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) inputMovement.y = 1f;
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) inputMovement.y = -1f;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) inputMovement.x = -1f;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) inputMovement.x = 1f;
+            if (Keyboard.current.wKey.isPressed) inputMovement.y = 1f;
+            if (Keyboard.current.sKey.isPressed) inputMovement.y = -1f;
+            if (Keyboard.current.aKey.isPressed) inputMovement.x = -1f;
+            if (Keyboard.current.dKey.isPressed) inputMovement.x = 1f;
         }
         else
         {
